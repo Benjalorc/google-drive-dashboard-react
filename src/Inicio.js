@@ -1,7 +1,17 @@
-import React {useState} from 'react';
+import React, { createRef, useState } from 'react';
 import './Inicio.css';
 
-renderButton(){
+function Inicio(){
+
+  let [isLogged, setLogged] = useState(false);
+  let [loading, setLoading] = useState(false);
+  let gapi = createRef(window.gapi);
+  let gUser = createRef("");
+  let username = createRef("");
+  let imgUrl = createRef("");
+
+
+function renderButton(){
 
   	setLoading(true);
 
@@ -42,15 +52,15 @@ renderButton(){
     setLoading(false);
 }
 
-cambiarUsuario(){
+function cambiarUsuario(){
 	let element = document.querySelector("#my-signin2 > div");
 	element.click()
 }
 
-function Inicio() {
+function goDashboard(){
+	console.log("placeholder");
+}
 
-  let [isLogged, setLogged] = useState(false);
-  let [loading, setLoading] = useState(false);
 
   if(isLogged){
 
@@ -77,23 +87,24 @@ function Inicio() {
 
 							<div className="col-3 col-md-4"></div>
 							<div className="col-6 col-md-4 profilePic">
-								<img className="card-img-top profilePic" (click)="cambiarUsuario()" [src]="imgUrl">
-								<span className="overlay-switch" (click)="cambiarUsuario()"><i className="fa fa-exchange" aria-hidden="true"></i></span>
+								<img className="card-img-top profilePic" src={imgUrl} onClick={()=> cambiarUsuario() } />
+								<span className="overlay-switch" onClick={()=> cambiarUsuario() }><i className="fa fa-exchange" aria-hidden="true"></i></span>
 							</div>
 							<div className="col-3 col-md-4"></div>
 							<div className="col-12">
 								<h5 className="card-title">Bienvenido(a) {username}!</h5>
 								<p className="card-text">Ya puede ingresar a su dashboard haciendo click en el botón a continuación.</p>
-								<a className="btn btn-outline-success" (click)="goDashboard()">Continuar</a>
+								<a className="btn btn-outline-success" onClick={()=> goDashboard() }>Continuar</a>
 							</div>
 						</div>
 					</div>
 					
 					<div className="card-footer text-muted">
-						<span className="wrongUserLink" (click)="cambiarUsuario()"> ¿No eres {username}? </span> 
+						<span className="wrongUserLink" onClick={()=> cambiarUsuario() }> ¿No eres {username}? </span> 
 					</div>
 				
 				</div>
+			</div>
 			<div className="col-12 col-md-3"></div>
 		</div>
 	  );
