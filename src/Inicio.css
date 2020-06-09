@@ -1,0 +1,68 @@
+div.profilePic{
+	display: grid;
+	margin-bottom: 1rem;
+	transition: opacity 150ms;
+}
+div.profilePic:hover{
+	cursor: pointer;
+	opacity: 0.6;
+}
+div.profilePic:active{
+    opacity: 0.85;
+}
+img.profilePic{
+	grid-column: 1/2;
+	grid-row: 1/2;
+	border-radius: 50%;
+	width: 100%;
+}
+.overlay-switch{
+	opacity: 0;
+	transition: opacity 150ms;
+	font-size:	5rem;
+	align-self: center;
+	grid-column: 1/2;
+	grid-row: 1/2;
+	z-index: 10;
+}
+div.profilePic:hover > .overlay-switch {
+	opacity: 1;
+}
+.wrongUserLink:link {
+    text-decoration: none;
+}
+.wrongUserLink:hover {
+    text-decoration: underline;
+    color: rgba(160,160,160,1);
+}
+.wrongUserLink:active {
+    text-decoration: underline;
+    color: rgba(0,0,0,1);
+}
+
+img.carousel{
+	width: 100%;
+	height: 100%;
+}
+
+#my-signin2{
+	margin-bottom: 1rem;
+	display: flex;
+	justify-content: space-evenly;
+}
+
+.slide-text{
+	top: 50%;
+}
+
+.push-down{
+	margin-top: 3em
+}
+
+.golden{
+	color: rgba(255,200,0,1);
+}
+
+.box-shadow-1{
+	box-shadow: 0 0 10px;
+}
