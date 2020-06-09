@@ -1,16 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import { Provider } from "react-redux";
+import store  from "./redux/store/index";
+
 import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import Inicio from './Inicio';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-  <React.StrictMode>
-	<div class="container">
+  <Provider store={store}>
+	<div className="container">
 		<Inicio />
 	</div>
-  </React.StrictMode>,
+  </Provider>,
   document.getElementById('root')
 );
 

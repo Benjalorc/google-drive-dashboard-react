@@ -1,29 +1,52 @@
 import React, { createRef, useState } from 'react';
+import { connect, useSelector } from "react-redux";
+import { setUser } from "./redux/actions/index";
+import store from "./redux/store/index";
 import './Inicio.css';
+
+function mapToProps(dispatch) {
+	return{
+		setUser: user => dispatch(setUser(user))
+	}
+}
 
 function Inicio(){
 
-  let [isLogged, setLogged] = useState(false);
-  let [loading, setLoading] = useState(false);
+  let [loading, setLoading] = useState(true);
+  let [renderSent, setRenderSent] = useState(false);
   let gapi = createRef(window.gapi);
-  let gUser = createRef("");
-  let username = createRef("");
-  let imgUrl = createRef("");
 
+  const user = useSelector(state => state.user);
+
+function waitForGapi(){
+	return new Promise((resolve, reject)=>{
+		let interval = setInterval(check, 1000);
+		function check(){
+			if(window.gapi){
+				gapi.current = window.gapi;
+				clearInterval(interval);
+				resolve(true);
+			}
+		}
+	});
+}
 
 function renderButton(){
 
-  	setLoading(true);
+	if(renderSent) return false;
 
   	//Inicializa un boton pre-configurado para permitir
   	//El inicio de sesion
 
   	let onSignIn = (googleUser)=> {
-
-  		gUser.current = googleUser;
-  		username.current = googleUser.getBasicProfile().getName();
-  		imgUrl.current = googleUser.getBasicProfile().getImageUrl();
-		setLogged(true);
+		let perfil = googleUser.getBasicProfile();
+		let data = {
+			gUser: googleUser,
+			username: perfil.getName(),
+			imgUrl: perfil.getImageUrl(),
+			isLogged: true
+		}
+		store.dispatch(setUser(data));
 		setLoading(false);
 	}
 
@@ -32,7 +55,7 @@ function renderButton(){
 		setLoading(false);
 	}
 	
-  	gapi.signin2.render('my-signin2', {
+	gapi.current.signin2.render('my-signin2', {
         'scope': 'profile email',
         'width': 220,
         'height': 50,
@@ -42,14 +65,24 @@ function renderButton(){
         'onfailure': onFailure
     });
 
-    setTimeout(() =>{
+    let addEvent = ()=>{
+	    setTimeout(() =>{
 
-		let element = document.querySelector("#my-signin2 > div");
-		element.addEventListener("click", ()=>{
-			setLoading(true);
-		});
-    },1000);
-    setLoading(false);
+			let element = document.querySelector("#my-signin2 > div");
+			if(element){
+				element.addEventListener("click", ()=>{
+					setLoading(true);
+				});
+			}
+			else{
+				addEvent();
+			}
+	    },1000);
+    }
+    addEvent();
+
+	setRenderSent(true);
+    //setLoading(false);
 }
 
 function cambiarUsuario(){
@@ -61,8 +94,14 @@ function goDashboard(){
 	console.log("placeholder");
 }
 
+if(!gapi.current){
+	waitForGapi().then(()=> renderButton());
+}
+else{
+	renderButton();
+}
 
-  if(isLogged){
+  if(user && user.isLogged){
 
 	  return (
 		<div className="row login">
@@ -87,20 +126,20 @@ function goDashboard(){
 
 							<div className="col-3 col-md-4"></div>
 							<div className="col-6 col-md-4 profilePic">
-								<img className="card-img-top profilePic" src={imgUrl} onClick={()=> cambiarUsuario() } />
+								<img className="card-img-top profilePic" alt="user" src={user.imgUrl} onClick={()=> cambiarUsuario() } />
 								<span className="overlay-switch" onClick={()=> cambiarUsuario() }><i className="fa fa-exchange" aria-hidden="true"></i></span>
 							</div>
 							<div className="col-3 col-md-4"></div>
 							<div className="col-12">
-								<h5 className="card-title">Bienvenido(a) {username}!</h5>
+								<h5 className="card-title">Bienvenido(a) {user.username}!</h5>
 								<p className="card-text">Ya puede ingresar a su dashboard haciendo click en el botón a continuación.</p>
-								<a className="btn btn-outline-success" onClick={()=> goDashboard() }>Continuar</a>
+								<a className="btn btn-outline-success" href="#" onClick={()=> goDashboard() }>Continuar</a>
 							</div>
 						</div>
 					</div>
 					
 					<div className="card-footer text-muted">
-						<span className="wrongUserLink" onClick={()=> cambiarUsuario() }> ¿No eres {username}? </span> 
+						<span className="wrongUserLink" onClick={()=> cambiarUsuario() }> ¿No eres {user.username}? </span>
 					</div>
 				
 				</div>
@@ -139,4 +178,4 @@ function goDashboard(){
 
 }
 
-export default Inicio;
+export default connect(mapToProps)(Inicio);
