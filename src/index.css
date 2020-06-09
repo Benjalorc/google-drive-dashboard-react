@@ -11,3 +11,30 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.container{
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+}
+.dash-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 15;
+}
+
+i.fa-spinner{
+  position: fixed;
+  left: calc(50% - 30px);
+  top:  calc(50% - 50px);
+  z-index: 15;
+}
+
+div.loadingCorner > i.fa-spinner{
+  position: fixed;
+  left: calc(1% );
+  top:  calc(1% );
+  z-index: 15;
+}
