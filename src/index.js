@@ -4,15 +4,17 @@ import ReactDOM from 'react-dom';
 import { Provider } from "react-redux";
 import store  from "./redux/store/index";
 
-import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'font-awesome/css/font-awesome.min.css';
 import './index.css';
 import Inicio from './Inicio';
+import Dashboard from './Dashboard';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <Provider store={store}>
 	<div className="container">
-		<Inicio />
+		<Dashboard />
 	</div>
   </Provider>,
   document.getElementById('root')
