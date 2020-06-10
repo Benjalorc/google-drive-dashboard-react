@@ -39,7 +39,6 @@ function rootReducer(state = initialState, action){
 			return Object.assign({}, state, {storage: action.payload});
 
 		case CHECK_STATUS:
-			console.log("HEEEE", action.payload);
 			return Object.assign({}, state, {status: action.payload});
 
 		case UPDATE_CHANGES_TOKEN:
