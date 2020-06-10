@@ -36,6 +36,18 @@ function verifiedStatus(status){
 	}
 }
 
+function waitForGapi(){
+	return new Promise((resolve, reject)=>{
+		let interval = setInterval(check, 1000);
+		function check(){
+			if(window.gapi){
+				clearInterval(interval);
+				resolve(true);
+			}
+		}
+	});
+}
+
 export function loadStorage(){
 
 	return function (dispatch) {
@@ -80,10 +92,11 @@ export function loadStorage(){
 
 export function checkStatus(){
 
-	return function (dispatch) {
+	return async function (dispatch) {
 
 		//Si aun no existe una instancia de googleAuth la inicializa
 		//Y retorna un JSON que se podra leer cuando la operación se complete
+		await waitForGapi();
 
 		const gapi = window.gapi;
 
@@ -107,7 +120,6 @@ export function checkStatus(){
 				dispatch(verifiedStatus("disconnected"));
 			}
 		}
-
 
 		if(!gapi.auth2 || !gapi.auth2.getAuthInstance()){
 
