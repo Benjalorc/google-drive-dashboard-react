@@ -10,6 +10,7 @@ import {
 } from "./redux/actions/index";
 import './Dashboard.css';
 import { Chart } from 'chart.js';
+import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 
 function StorageUsage(){
 
@@ -171,6 +172,89 @@ function StorageUsage(){
 
 }
 
+function ChangesTable({changes}){
+
+
+	if(!changes || !changes.length){
+
+		return(
+			<p className="card-text">No hay cambios en archivos que mostrar</p>
+		)
+	}
+	else{
+
+		return (
+            <div className="table-responsive">
+
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Ubicacion</th>
+                            <th scope="col">Modificado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {
+                    	changes.map((file, i)=>{
+                    		return(
+		                        <tr>
+		                            <th scope="row">{i+1}</th>
+		                            <td>{file.name}</td>
+		                            <td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
+		                            <td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
+		                        </tr>
+                    		)
+                    	})
+                    }
+                    </tbody>
+                </table>
+
+            </div>
+		)
+	}
+}
+
+function RecentChanges(){
+
+	const changes = useSelector(state => state.changes);
+
+	console.log(changes);
+
+	const [activeTab, setActiveTab] = useState('1');
+	const toggle = tab => {
+		if(activeTab !== tab) setActiveTab(tab);
+	}
+
+
+  	return (
+		<div className="card border-warning bg-transparent">
+			<div className="card-body">
+		      <Nav tabs>
+		        <NavItem>
+		          <NavLink
+		            className={ `${ activeTab === '1' ? 'active' : '' }` }
+		            onClick={() => { toggle('1'); }}
+		          >
+		            Cambios recientes en archivos
+		          </NavLink>
+		        </NavItem>
+		      </Nav>
+		      <TabContent activeTab={activeTab}>
+		        <TabPane tabId="1">
+		          <div className="row">
+		            <div className="col-12">
+		            	<ChangesTable changes={changes.list}/>
+		            </div>
+		          </div>
+		        </TabPane>
+		      </TabContent>
+			</div>
+	    </div>
+  	);
+}
+
 function SideNav(){
 
 	const user = useSelector(state => state.user);
@@ -244,8 +328,6 @@ function Dashboard(){
 	let gapi = createRef();
 
 	const dispatch = useDispatch();
-	//const user = useSelector(state => state.user);
-	//const changes = useSelector(state => state.changes);
 	//const files = useSelector(state => state.files);
 	const authStatus = useSelector(state => state.status);
 
@@ -261,7 +343,7 @@ function Dashboard(){
     		gapi.current = window.gapi;
 	        cargarPerfil();
 	        dispatch(loadStorage());
-	        //dispatch(getChanges());
+	        dispatch(getChanges());
 	        //dispatch(getFilesList(files.token));
 	        setFirst(true);
     	}
@@ -286,6 +368,7 @@ function Dashboard(){
 	return (
 		<React.Fragment>
 			<StorageUsage />
+			<RecentChanges />
 			<SideNav />
 			<React.Fragment>
 				<div ref={cornerLoading} className="loadingCorner">
