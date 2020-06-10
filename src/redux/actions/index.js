@@ -40,13 +40,41 @@ export function loadStorage(){
 
 	return function (dispatch) {
 
-		let data = {'fields': "storageQuota, maxUploadSize, maxImportSizes"};
-		return window.gapi.client.drive.about.get(data)
-			.then((response)=> {
-				if(response.status === 200){
-					dispatch(recieveStorageData(response.result));
-				}
-	        });
+		let obj = {'fields': "storageQuota, maxUploadSize, maxImportSizes"};
+		return window.gapi.client.drive.about.get(obj).then((data)=> {
+
+			if(data.status === 200){
+
+		        let quota = data.result.storageQuota;
+		        let maxImports = data.result.maxImportSizes;
+
+		        let usage = {
+			        storageLimit: (!quota.limit ? 0 : parseFloat((quota.limit/1073741824).toFixed(2)) ),
+			        storageUsage: (!quota.usage ? 0 : parseFloat((quota.usage/1073741824).toFixed(2)) ),
+			        storageUsageDrive: (!quota.usageInDrive ? 0 : parseFloat((quota.usageInDrive/1073741824).toFixed(2)) ),
+			        storageUsageTrash: (!quota.usageInTrash ? 0 : parseFloat((quota.usageInTrash/1073741824).toFixed(2)) )
+		        }
+		        let uploads = {
+					maxUploadSize: !data.result.maxUploadSize ? 0 : parseFloat((data.result.maxUploadSize/1024/1024/1024/1024).toFixed(2))
+		        }
+
+		        let docsize = maxImports["application/vnd.google-apps.document"];
+		        let drawsize = maxImports["application/vnd.google-apps.drawing"];
+		        let sheetsize = maxImports["application/vnd.google-apps.spreadsheet"];
+		        let slidesize = maxImports["application/vnd.google-apps.presentation"];
+
+		        let imports = {
+			        document: !parseFloat(docsize) ? 0 : (parseFloat(docsize)/1048576).toFixed(2),
+			        draw: !parseFloat(drawsize) ? 0 : (parseFloat(drawsize)/1048576).toFixed(2),
+			        spreadsheet: !parseFloat(sheetsize) ? 0 : (parseFloat(sheetsize)/1048576).toFixed(2),
+			        presentation: !parseFloat(slidesize) ? 0 : (parseFloat(slidesize)/1048576).toFixed(2)
+		        }
+
+		        //Ya almacenadas las variables procede a enviar
+		        //los datos para dibujar las gráficas
+				dispatch(recieveStorageData({usage, uploads, imports}));
+			}
+		});
 	}
 }
 
