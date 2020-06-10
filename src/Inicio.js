@@ -1,4 +1,5 @@
 import React, { createRef, useState } from 'react';
+import { Link } from "react-router-dom";
 import { connect, useSelector } from "react-redux";
 import { setUser } from "./redux/actions/index";
 import store from "./redux/store/index";
@@ -133,7 +134,7 @@ else{
 							<div className="col-12">
 								<h5 className="card-title">Bienvenido(a) {user.username}!</h5>
 								<p className="card-text">Ya puede ingresar a su dashboard haciendo click en el botón a continuación.</p>
-								<a className="btn btn-outline-success" href="#" onClick={()=> goDashboard() }>Continuar</a>
+								<Link to="/dashboard" className="btn btn-outline-success">Continuar</Link>
 							</div>
 						</div>
 					</div>

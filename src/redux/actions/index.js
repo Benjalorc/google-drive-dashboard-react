@@ -50,7 +50,9 @@ function waitForGapi(){
 
 export function loadStorage(){
 
-	return function (dispatch) {
+	return async function (dispatch) {
+
+		await waitForGapi();
 
 		let obj = {'fields': "storageQuota, maxUploadSize, maxImportSizes"};
 		return window.gapi.client.drive.about.get(obj).then((data)=> {
@@ -121,17 +123,12 @@ export function checkStatus(){
 			}
 		}
 
-		if(!gapi.auth2 || !gapi.auth2.getAuthInstance()){
-
-	        return gapi.client.init({
-	          'apiKey': apiKey,
-	          'clientId': clientId,
-	          'scope': scope,
-	          'discoveryDocs': discoveryDocs
-	        }).then(final);
-	    }
-
-		return final();
+        return gapi.client.init({
+          'apiKey': apiKey,
+          'clientId': clientId,
+          'scope': scope,
+          'discoveryDocs': discoveryDocs
+        }).then(final);
 	}
 }
 

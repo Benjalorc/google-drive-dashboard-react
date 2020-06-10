@@ -4,6 +4,12 @@ import ReactDOM from 'react-dom';
 import { Provider } from "react-redux";
 import store  from "./redux/store/index";
 
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import './index.css';
@@ -12,9 +18,19 @@ import Dashboard from './Dashboard';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
+
   <Provider store={store}>
 	<div className="container">
-		<Dashboard />
+	    <Router>
+	        <Switch>
+	          <Route path="/dashboard">
+	            <Dashboard />
+	          </Route>
+	          <Route path="/">
+	            <Inicio />
+	          </Route>
+	        </Switch>
+	    </Router>
 	</div>
   </Provider>,
   document.getElementById('root')

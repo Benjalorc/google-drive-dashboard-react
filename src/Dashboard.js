@@ -1,4 +1,5 @@
 import React, { createRef, useRef, useState, useEffect } from 'react';
+import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { 
 	setUser,
@@ -174,6 +175,7 @@ function SideNav(){
 
 	const user = useSelector(state => state.user);
 	const mySidenav = useRef();
+	let history = useHistory();
 
 	if(!user || !user.gUser) return null;
 
@@ -182,6 +184,11 @@ function SideNav(){
 	let usermail = profile.getEmail();
 	let username = profile.getName();
 	let userpic = profile.getImageUrl();
+
+	function toHome(){
+		toggleMenu();
+		history.push('/');
+	}
 
 	function toggleMenu(){
 		if(mySidenav.current.classList.contains("open")){
@@ -211,7 +218,7 @@ function SideNav(){
 			        </div>
 
 			        <div className="card-footer text-muted">
-			            <button type="button" className="btn btn-outline-danger" onClick={()=> console.log("SignOut") }><i className="fa fa-sign-out"></i>Salir</button>
+			            <button type="button" className="btn btn-outline-danger" onClick={()=> toHome() }><i className="fa fa-sign-out"></i>Salir</button>
 			        </div>
 
 			    </div>
@@ -269,10 +276,6 @@ function Dashboard(){
 		}
 		dispatch(setUser(data));
 		setSessionExpires(parseFloat(((expires - Date.now())/60000).toFixed(1)));
-	}
-
-	function toHome(){
-		console.log("placeholder");
 	}
 
 	return (
