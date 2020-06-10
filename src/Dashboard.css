@@ -61,3 +61,15 @@ img.link:active{
 .sidenav:not(.open) + .dash-backdrop{
 	display: none;
 }
+
+.bd-2:not(.loading),
+.bd-2:not(.loading)+i{
+	display: none;
+}
+.loadingCorner:not(.loading){
+	display: none;
+}
+.loadingCorner>i,
+.bd-2+i{
+	 font-size:48px
+}

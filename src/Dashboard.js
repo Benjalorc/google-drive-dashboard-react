@@ -239,6 +239,8 @@ function Dashboard(){
 	let [first, setFirst] = useState(false);
 	let [loading, setLoading] = useState(true);
 	let [sessionExpires, setSessionExpires] = useState(null);
+	let backdropLoading = useRef(null);
+	let cornerLoading = useRef(null);
 	let gapi = createRef();
 
 	const dispatch = useDispatch();
@@ -253,6 +255,9 @@ function Dashboard(){
 
     useEffect(()=>{
     	if(authStatus === "connected" && !first){
+
+			backdropLoading.current.classList.remove("loading");
+			cornerLoading.current.classList.add("loading");
     		gapi.current = window.gapi;
 	        cargarPerfil();
 	        dispatch(loadStorage());
@@ -282,6 +287,13 @@ function Dashboard(){
 		<React.Fragment>
 			<StorageUsage />
 			<SideNav />
+			<React.Fragment>
+				<div ref={cornerLoading} className="loadingCorner">
+				    <i className="fa fa-spinner fa-spin"></i>
+				</div>
+				<div ref={backdropLoading} className="dash-backdrop bd-2 loading"></div>
+				<i className="fa fa-spinner fa-spin"></i>
+			</React.Fragment>
 		</React.Fragment>
 	)
 
