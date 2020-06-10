@@ -10,7 +10,12 @@ import {
 import './Dashboard.css';
 import { Chart } from 'chart.js';
 
-function StorageUsage({usage}){
+function StorageUsage(){
+
+	const storage = useSelector(state => state.storage);
+    useEffect(()=>{
+		console.log(storage);
+    }, [storage]);
 
 	const storageCanvas = useRef(null);
 	const driveCanvas = useRef(null);
@@ -20,9 +25,13 @@ function StorageUsage({usage}){
 	let driveStorageChart = createRef(null);
 	let trashStorageChart = createRef(null);
 
-  function drawStorageTotalChart(){
+    if(!storage || !storage.usage) return null;
 
-  	if(!totalStorageChart.current){
+    let usage = storage.usage;
+
+	function drawStorageTotalChart(){
+
+		if(!totalStorageChart.current){
 
 	    let data = {
 	      labels: ['En uso','Disponible'],
@@ -34,13 +43,13 @@ function StorageUsage({usage}){
 	    };
 
 	    totalStorageChart.current = drawChart(storageCanvas.current, 'pie', data);
-  	}
+		}
 
-  }
+	}
 
-  function drawStorageDriveChart(){
+	function drawStorageDriveChart(){
 
-  	if(!driveStorageChart.current){
+		if(!driveStorageChart.current){
 
 	    let data = {
 	      labels: ['En Drive','Otros'],
@@ -53,12 +62,12 @@ function StorageUsage({usage}){
 
 		driveStorageChart.current = drawChart(driveCanvas.current, 'pie', data);
 	    //setDriveStorageChart(drawChart('driveChartCanvas', 'pie', data));
-  	}
-  }
+		}
+	}
 
-  function drawStorageTrashChart(){
+	function drawStorageTrashChart(){
 
-  	if(!trashStorageChart.current){
+		if(!trashStorageChart.current){
 
 	    let data = {
 	      labels: ['Papelera','Otros'],
@@ -71,40 +80,38 @@ function StorageUsage({usage}){
 
 	    trashStorageChart.current = drawChart(trashCanvas.current, 'pie', data);
 	    //setTrashStorageChart(drawChart('trashChartCanvas', 'pie', data));
-  	}
-  }
+		}
+	}
 
 
-  function drawChart(id, type, data) {
+	function drawChart(id, type, data) {
 
-        return new Chart(id, {
-          type: type,
-          data: data,
-          options: {
-            legend: {
-              display: false
-            },
-            scales: {
-              xAxes: [{
-                display: true
-              }],
-              yAxes: [{
-                display: true
-              }],
-            }
-          }
-        });
+	    return new Chart(id, {
+	      type: type,
+	      data: data,
+	      options: {
+	        legend: {
+	          display: false
+	        },
+	        scales: {
+	          xAxes: [{
+	            display: true
+	          }],
+	          yAxes: [{
+	            display: true
+	          }],
+	        }
+	      }
+	    });
 
-  }
+	}
 
-  setTimeout(()=>{
-  	console.log("QUE VOY PUES!");
-	drawStorageTotalChart();
-	drawStorageDriveChart();
-	drawStorageTrashChart();
-  }, 1000);
+	setTimeout(()=>{
+		drawStorageTotalChart();
+		drawStorageDriveChart();
+		drawStorageTrashChart();
+	}, 1000);
 
-	console.log("RENDER DUDE...");
 	return(
 		<div className="row spacing-1">
 
@@ -163,6 +170,63 @@ function StorageUsage({usage}){
 
 }
 
+function SideNav(){
+
+	const user = useSelector(state => state.user);
+	const mySidenav = useRef();
+
+	if(!user || !user.gUser) return null;
+
+	let profile = user.gUser.getBasicProfile();
+
+	let usermail = profile.getEmail();
+	let username = profile.getName();
+	let userpic = profile.getImageUrl();
+
+	function toggleMenu(){
+		if(mySidenav.current.classList.contains("open")){
+			mySidenav.current.classList.remove("open");
+		}
+		else{
+			mySidenav.current.classList.add("open");
+		}
+	}
+
+	return(
+
+		<React.Fragment>
+			<div className="sidenav" ref={mySidenav} id="mySidenav">
+
+			    <div className="card bg-light">
+
+			        <div className="card-header">
+			            <i className="fa fa-user-circle-o"></i> Usuario
+			        </div>
+
+			        <div className="card-body">
+			            <p className="card-text"><i className="fa fa-address-card-o"></i> Nombre:</p>
+			            <p>{username}</p>
+			            <p className="card-text"><i className="fa fa-envelope-open-o"></i> E-mail:</p>
+			            <p>{usermail}</p>
+			        </div>
+
+			        <div className="card-footer text-muted">
+			            <button type="button" className="btn btn-outline-danger" onClick={()=> console.log("SignOut") }><i className="fa fa-sign-out"></i>Salir</button>
+			        </div>
+
+			    </div>
+
+			</div>
+
+			<div className="dash-backdrop" onClick={()=> toggleMenu() }></div>
+
+			<div className="floating-special" onClick={()=> toggleMenu() }>
+			    <img src={userpic} className="profilePic" />
+			</div>
+		</React.Fragment>
+	)
+}
+
 function Dashboard(){
 
 	let [first, setFirst] = useState(false);
@@ -172,7 +236,6 @@ function Dashboard(){
 
 	const dispatch = useDispatch();
 	//const user = useSelector(state => state.user);
-	const storage = useSelector(state => state.storage);
 	//const changes = useSelector(state => state.changes);
 	//const files = useSelector(state => state.files);
 	const authStatus = useSelector(state => state.status);
@@ -182,13 +245,9 @@ function Dashboard(){
     }, [dispatch]);
 
     useEffect(()=>{
-    	console.log("HAY STORAGE", storage);
-    }, [storage]);
-
-    useEffect(()=>{
     	if(authStatus === "connected" && !first){
     		gapi.current = window.gapi;
-	        //cargarPerfil();
+	        cargarPerfil();
 	        dispatch(loadStorage());
 	        //dispatch(getChanges());
 	        //dispatch(getFilesList(files.token));
@@ -216,17 +275,12 @@ function Dashboard(){
 		console.log("placeholder");
 	}
 
-	console.log("REEEENDERRRR");
-
-	if(storage && storage.usage){
-		return (
-			<StorageUsage usage={storage.usage} />
-		)
-	}
-	else{
-		return null;
-	}
-
+	return (
+		<React.Fragment>
+			<StorageUsage />
+			<SideNav />
+		</React.Fragment>
+	)
 
 }
 
