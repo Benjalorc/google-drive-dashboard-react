@@ -1,4 +1,11 @@
-import { SET_USER, GET_USER } from "../constants/action-types";
+import {
+	SET_USER,
+	GET_USER,
+	LOAD_STORAGE,
+	CHECK_STATUS,
+	UPDATE_CHANGES_TOKEN,
+	UPDATE_FILES_TOKEN
+} from "../constants/action-types";
 
 const initialState = {
 	user: {
@@ -7,17 +14,43 @@ const initialState = {
 		imgUrl: null,
 		isLogged: false
 	},
+	storage: {},
+	changes: {
+		token: "",
+		list: []
+	},
+	files: {
+		token: "",
+		list: []
+	},
+	status: null
 }
 
 function rootReducer(state = initialState, action){
-	console.log("VAMOS VAMOS", action);
-	if(action.type === SET_USER){
-		return Object.assign({}, state, {user: action.payload});
+
+	switch(action.type){
+		case SET_USER:
+			return Object.assign({}, state, {user: action.payload});
+
+		case GET_USER:
+			return Object.assign({}, state, {user: action.payload});
+
+		case LOAD_STORAGE:
+			return Object.assign({}, state, {storage: action.payload});
+
+		case CHECK_STATUS:
+			console.log("HEEEE", action.payload);
+			return Object.assign({}, state, {status: action.payload});
+
+		case UPDATE_CHANGES_TOKEN:
+			return Object.assign({}, state, {changes: action.payload});
+
+		case UPDATE_FILES_TOKEN:
+			return Object.assign({}, state, {files: action.payload});
+
+		default:
+			return state;
 	}
-	else if(action.type === GET_USER){
-		return Object.assign({}, state, {user: action.payload});
-	}
-	return state;
 }
 
 export default rootReducer;
