@@ -2,7 +2,6 @@ import React, { createRef, useRef, useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { 
-	setUser,
 	loadStorage,
 	checkStatus,
 	getChanges,
@@ -11,6 +10,98 @@ import {
 import './Dashboard.css';
 import { Chart } from 'chart.js';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+
+function FilesTable({files, titulo, short = true}){
+
+
+	if(!files || !files.length){
+
+		return (
+			<p className="card-text">No hay documentos que mostrar</p>
+		)
+	}
+	else{
+
+		if(short){
+
+			let arr = [0,1,2,3,4];
+			return(
+				<div className="table-responsive">
+
+				    <table className="table">
+				        <thead>
+				            <tr>
+				                <th scope="col">#</th>
+				                <th scope="col">Nombre</th>
+				                <th scope="col">Ubicacion</th>
+				                <th scope="col">Modificado</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+						{
+							arr.map((i)=>{
+								let file = files[i];
+								if(!file) return null;
+								return(
+									<tr key={`${titulo}-${i+1}`}>
+										<th scope="row">{i+1}</th>
+										<td>{file.name}</td>
+										<td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
+										<td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
+									</tr>
+								)
+
+							})
+						}
+				        </tbody>
+			        </table>
+
+			    </div>
+			)
+		}
+	}
+}
+
+function FilesPerType({files, cardClass, headerClass, titulo}){
+
+	//`<app-filemodal [listado]="files" [titulo]="titulo"></app-filemodal>`
+
+	return(
+		<React.Fragment>
+
+		    <div className={cardClass}>
+		        <div className={headerClass}>{titulo}</div>
+		        <div className="card-body">
+		        	<FilesTable files={files} titulo={titulo} />
+		        </div>
+		    </div>
+		</React.Fragment>
+	)
+}
+
+function FilesCards({doneLoading}){
+
+	const dispatch = useDispatch();
+	const files = useSelector(state => state.files);
+
+	useEffect(()=>{
+		if(files.token && files.token !== ""){
+			dispatch(getFilesList(files.token));
+		}
+		else if(files.token === false){
+			doneLoading(true);
+		}
+	}, [files, dispatch])
+
+	return(
+		<React.Fragment>
+			<FilesPerType files={files.list.docs} cardClass="card border-primary bg-light mb-3" headerClass="card-header bg-primary text-white" titulo="Documentos" />
+			<FilesPerType files={files.list.presentations} cardClass="card border-warning bg-light mb-3" headerClass="card-header bg-warning text-white" titulo="Presentaciones" />
+			<FilesPerType files={files.list.sheets} cardClass="card border-success bg-light mb-3" headerClass="card-header bg-success text-white" titulo="Hojas de Cálculo" />
+			<FilesPerType files={files.list.drawings} cardClass="card border-danger bg-light mb-3" headerClass="card-header bg-danger text-white" titulo="Drawings" />
+		</React.Fragment>
+	)
+}
 
 function StorageUsage(){
 
@@ -199,7 +290,7 @@ function ChangesTable({changes}){
                     {
                     	changes.map((file, i)=>{
                     		return(
-		                        <tr>
+		                        <tr key={`changes-${i+1}`}>
 		                            <th scope="row">{i+1}</th>
 		                            <td>{file.name}</td>
 		                            <td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
@@ -219,9 +310,6 @@ function ChangesTable({changes}){
 function RecentChanges(){
 
 	const changes = useSelector(state => state.changes);
-
-	console.log(changes);
-
 	const [activeTab, setActiveTab] = useState('1');
 	const toggle = tab => {
 		if(activeTab !== tab) setActiveTab(tab);
@@ -312,7 +400,7 @@ function SideNav(){
 			<div className="dash-backdrop" onClick={()=> toggleMenu() }></div>
 
 			<div className="floating-special" onClick={()=> toggleMenu() }>
-			    <img src={userpic} className="profilePic" />
+			    <img src={userpic} className="profilePic" alt="profile_pic" />
 			</div>
 		</React.Fragment>
 	)
@@ -321,54 +409,49 @@ function SideNav(){
 function Dashboard(){
 
 	let [first, setFirst] = useState(false);
-	let [loading, setLoading] = useState(true);
 	let [sessionExpires, setSessionExpires] = useState(null);
 	let backdropLoading = useRef(null);
 	let cornerLoading = useRef(null);
-	let gapi = createRef();
-
 	const dispatch = useDispatch();
-	//const files = useSelector(state => state.files);
-	const authStatus = useSelector(state => state.status);
+	const user = useSelector(state => state.user);
 
     useEffect(()=>{
     	dispatch(checkStatus());
     }, [dispatch]);
 
     useEffect(()=>{
-    	if(authStatus === "connected" && !first){
+
+    	if(user.isLogged === true && !first){
+
 
 			backdropLoading.current.classList.remove("loading");
 			cornerLoading.current.classList.add("loading");
-    		gapi.current = window.gapi;
-	        cargarPerfil();
 	        dispatch(loadStorage());
 	        dispatch(getChanges());
-	        //dispatch(getFilesList(files.token));
+	        dispatch(getFilesList(""));
 	        setFirst(true);
     	}
-    }, [authStatus, dispatch, gapi]);
+    }, [user.isLogged, setFirst, dispatch]);
 
+    useEffect(()=>{
 
-	function cargarPerfil(){
+    	if(user && user.gUser){
+    		let expires = user.gUser.getAuthResponse().expires_at;
+    		setSessionExpires(parseFloat(((expires - Date.now())/60000).toFixed(1)));
+    	}
 
-		let googleUser = gapi.current.auth2.getAuthInstance().currentUser.get()
-		let expires = googleUser.getAuthResponse().expires_at;
-		let perfil = googleUser.getBasicProfile();
-		let data = {
-			gUser: googleUser,
-			username: perfil.getName(),
-			imgUrl: perfil.getImageUrl(),
-			isLogged: true
-		}
-		dispatch(setUser(data));
-		setSessionExpires(parseFloat(((expires - Date.now())/60000).toFixed(1)));
-	}
+    }, [user]);
+
+    function spinOff(){
+		backdropLoading.current.classList.remove("loading");
+		cornerLoading.current.classList.remove("loading");
+    }
 
 	return (
 		<React.Fragment>
 			<StorageUsage />
 			<RecentChanges />
+			<FilesCards doneLoading={()=> spinOff() } />
 			<SideNav />
 			<React.Fragment>
 				<div ref={cornerLoading} className="loadingCorner">
