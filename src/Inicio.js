@@ -91,10 +91,6 @@ function cambiarUsuario(){
 	element.click()
 }
 
-function goDashboard(){
-	console.log("placeholder");
-}
-
 if(!gapi.current){
 	waitForGapi().then(()=> renderButton());
 }
