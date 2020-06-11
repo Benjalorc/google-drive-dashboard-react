@@ -70,7 +70,7 @@ function rootReducer(state = initialState, action){
 					docs: state.files.list.docs.concat(action.payload.list.docs),
 					sheets: state.files.list.sheets.concat(action.payload.list.sheets),
 					presentations: state.files.list.presentations.concat(action.payload.list.presentations),
-					drawings: state.files.list.drawings.concat(action.payload.list.docs)
+					drawings: state.files.list.drawings.concat(action.payload.list.drawings)
 				}
 			};
 			return Object.assign({}, state, {files: data});
