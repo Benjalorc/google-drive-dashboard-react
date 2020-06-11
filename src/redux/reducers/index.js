@@ -12,7 +12,7 @@ const initialState = {
 		gUser: null,
 		username: null,
 		imgUrl: null,
-		isLogged: false
+		isLogged: null
 	},
 	storage: {},
 	changes: {
@@ -21,7 +21,12 @@ const initialState = {
 	},
 	files: {
 		token: "",
-		list: []
+		list: {
+			docs: [],
+			sheets: [],
+			presentations: [],
+			drawings: []
+		}
 	},
 	status: null
 }
@@ -45,7 +50,17 @@ function rootReducer(state = initialState, action){
 			return Object.assign({}, state, {changes: action.payload});
 
 		case UPDATE_FILES_TOKEN:
-			return Object.assign({}, state, {files: action.payload});
+
+			let data = {
+				token: action.payload.token,
+				list: {
+					docs: state.files.list.docs.concat(action.payload.list.docs),
+					sheets: state.files.list.sheets.concat(action.payload.list.sheets),
+					presentations: state.files.list.presentations.concat(action.payload.list.presentations),
+					drawings: state.files.list.drawings.concat(action.payload.list.docs)
+				}
+			};
+			return Object.assign({}, state, {files: data});
 
 		default:
 			return state;

@@ -112,14 +112,24 @@ export function checkStatus(){
 			googleAuth = gapi.auth2.getAuthInstance();
 			let con = googleAuth.isSignedIn.get();
 			if(con){
-				dispatch(verifiedStatus("connected"));
+
+				let googleUser = googleAuth.currentUser.get()
+				let perfil = googleUser.getBasicProfile();
+				let usuario = {
+					gUser: googleUser,
+					username: perfil.getName(),
+					imgUrl: perfil.getImageUrl(),
+					isLogged: true
+				}
+
 				return gapi.client.drive.changes.getStartPageToken().then((res) =>{
 					let token = res.result.startPageToken;
 					dispatch(recieveTokens(UPDATE_CHANGES_TOKEN, {token: token, list: []}));
+					dispatch(setUser(usuario));
 				});
 			}
 			else{
-				dispatch(verifiedStatus("disconnected"));
+				dispatch(setUser({isLogged: false}));
 			}
 		}
 
@@ -171,7 +181,43 @@ export function getFilesList(pageToken) {
 
 		return gapi.client.drive.files.list(data).then((res)=>{
 			if(res.status === 200){
-				dispatch(recieveTokens(UPDATE_FILES_TOKEN, {token: res.result.nextPageToken, list: res.result.files}));
+
+				let docs = [], sheets = [], presentations = [], drawings = [];
+				res.result.files.forEach((element) =>{
+
+				element.time = new Date(element.modifiedTime);
+				switch(element.mimeType){
+
+					case "application/vnd.google-apps.document":
+						docs.push(element);
+					break;
+
+					case "application/vnd.google-apps.spreadsheet":
+						sheets.push(element);
+					break;
+
+					case "application/vnd.google-apps.presentation":
+						presentations.push(element);
+					break;
+
+					case "application/vnd.google-apps.drawing":
+						drawings.push(element);
+					break;
+					default:
+				}
+
+				});
+
+				let payload = {
+					token: (res.result.nextPageToken || false),
+					list: {
+						docs,
+						sheets,
+						presentations,
+						drawings
+					}
+				};
+				dispatch(recieveTokens(UPDATE_FILES_TOKEN, payload));
 			}
 		});
 	}
