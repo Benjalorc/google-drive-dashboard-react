@@ -159,10 +159,22 @@ function FilesCards({doneLoading}){
 
 	return(
 		<React.Fragment>
-			<FilesPerType files={files.list.docs} cardClass="card border-primary bg-light mb-3" headerClass="card-header bg-primary text-white" titulo="Documentos" />
-			<FilesPerType files={files.list.presentations} cardClass="card border-warning bg-light mb-3" headerClass="card-header bg-warning text-white" titulo="Presentaciones" />
-			<FilesPerType files={files.list.sheets} cardClass="card border-success bg-light mb-3" headerClass="card-header bg-success text-white" titulo="Hojas de Cálculo" />
-			<FilesPerType files={files.list.drawings} cardClass="card border-danger bg-light mb-3" headerClass="card-header bg-danger text-white" titulo="Drawings" />
+		<div className="row spacing-1">
+		    <div className="col-12 col-lg-6 spacing-2">
+				<FilesPerType files={files.list.docs} cardClass="card border-primary bg-light mb-3" headerClass="card-header bg-primary text-white" titulo="Documentos" />
+			</div>
+			<div className="col-12 col-lg-6 spacing-2">
+				<FilesPerType files={files.list.presentations} cardClass="card border-warning bg-light mb-3" headerClass="card-header bg-warning text-white" titulo="Presentaciones" />
+			</div>
+		</div>
+		<div className="row spacing-1">
+		    <div className="col-12 col-lg-6 spacing-2">
+				<FilesPerType files={files.list.sheets} cardClass="card border-success bg-light mb-3" headerClass="card-header bg-success text-white" titulo="Hojas de Cálculo" />
+			</div>
+		    <div className="col-12 col-lg-6 spacing-2">
+				<FilesPerType files={files.list.drawings} cardClass="card border-danger bg-light mb-3" headerClass="card-header bg-danger text-white" titulo="Drawings" />
+			</div>
+		</div>
 		</React.Fragment>
 	)
 }
@@ -325,6 +337,30 @@ function StorageUsage(){
 		</div>
 	)
 
+}
+
+function FilesLimits(){
+
+	const storage = useSelector(state => state.storage);
+
+	return(
+
+        <div className="card text-white bg-info mb-3">
+            <div className="card-header">
+                Límites de tamaño de archivos
+            </div>
+            <div className="card-body">
+
+                <p> <strong>Subidas: </strong> {storage.uploads.maxUploadSize} TB</p>
+                <p> <strong>Documentos importados: </strong> {storage.imports.document} MB</p>
+                <p> <strong>Presentaciones importadas: </strong> {storage.imports.presentation} MB</p>
+                <p> <strong>Hojas de Cálculo importadas: </strong> {storage.imports.spreadsheet} MB</p>
+                <p> <strong>Drawings importados: </strong> {storage.imports.draw} MB</p>
+
+            </div>
+
+        </div>
+	)
 }
 
 function ChangesTable({changes}){
@@ -515,7 +551,14 @@ function Dashboard(){
 		<React.Fragment>
 			<GeneralOverview />
 			<StorageUsage />
-			<RecentChanges />
+			<div className="row spacing-1">
+				<div className="col-12 col-md-4 spacing-2">
+					<FilesLimits />
+				</div>
+				<div className="col-12 col-md-8 spacing-2">
+					<RecentChanges />
+				</div>
+			</div>
 			<FilesCards doneLoading={()=> spinOff() } />
 			<SideNav />
 			<React.Fragment>
