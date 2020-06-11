@@ -1,7 +1,5 @@
 export const SET_USER = "SET_USER";
-export const GET_USER = "GET_USER";
 export const LOAD_STORAGE = "LOAD_STORAGE";
-export const CHECK_STATUS = "CHECK_STATUS";
 export const UPDATE_CHANGES_TOKEN = "UPDATE_CHANGES_TOKEN";
 export const UPDATE_FILES_TOKEN = "UPDATE_FILES_TOKEN";
 export const CLEAR_STORE = "CLEAR_STORE";

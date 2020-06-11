@@ -1,8 +1,6 @@
 import {
 	SET_USER,
-	GET_USER,
 	LOAD_STORAGE,
-	CHECK_STATUS,
 	UPDATE_CHANGES_TOKEN,
 	UPDATE_FILES_TOKEN,
 	CLEAR_STORE
@@ -10,10 +8,6 @@ import {
 
 export function setUser(payload){
 	return {type: SET_USER, payload}
-}
-
-export function getUser(payload){
-	return {type: GET_USER, payload}
 }
 
 function recieveStorageData(payload){
@@ -27,13 +21,6 @@ function recieveTokens(tipo, payload){
 	return {
 		type: tipo,
 		payload
-	}
-}
-
-function verifiedStatus(status){
-	return {
-		type: CHECK_STATUS,
-		payload: status
 	}
 }
 
