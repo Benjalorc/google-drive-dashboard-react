@@ -5,7 +5,8 @@ import {
 	loadStorage,
 	checkStatus,
 	getChanges,
-	getFilesList
+	getFilesList,
+	logOut
 } from "./redux/actions/index";
 import './Dashboard.css';
 import { Chart } from 'chart.js';
@@ -36,7 +37,7 @@ function GeneralOverview(){
 		    <div className="col-12 col-sm-6 col-md-3">
 
 		        <div className="card text-center border-success bg-light">
-		            <a href="https://docs.google.com/spreadsheets/"><img className="card-img-top link" src="images/spreadsheets.png" alt="Card image cap" /></a>
+		            <a href="https://docs.google.com/spreadsheets/" target="_blank"><img className="card-img-top link" src="images/spreadsheets.png" alt="Card image cap" /></a>
 		            <div className="card-body">
 		                <p>Hojas de Cálculo</p>
 		            </div>
@@ -245,9 +246,6 @@ function FilesCards({doneLoading}){
 function StorageUsage(){
 
 	const storage = useSelector(state => state.storage);
-    useEffect(()=>{
-		console.log(storage);
-    }, [storage]);
 
 	const storageCanvas = useRef(null);
 	const driveCanvas = useRef(null);
@@ -263,7 +261,7 @@ function StorageUsage(){
 
 	function drawStorageTotalChart(){
 
-		if(!totalStorageChart.current){
+		if(!totalStorageChart.current && storageCanvas.current){
 
 	    let data = {
 	      labels: ['En uso','Disponible'],
@@ -281,7 +279,7 @@ function StorageUsage(){
 
 	function drawStorageDriveChart(){
 
-		if(!driveStorageChart.current){
+		if(!driveStorageChart.current && storageCanvas.current){
 
 	    let data = {
 	      labels: ['En Drive','Otros'],
@@ -299,7 +297,7 @@ function StorageUsage(){
 
 	function drawStorageTrashChart(){
 
-		if(!trashStorageChart.current){
+		if(!trashStorageChart.current && storageCanvas.current){
 
 	    let data = {
 	      labels: ['Papelera','Otros'],
@@ -506,11 +504,11 @@ function RecentChanges(){
   	);
 }
 
-function SideNav(){
+function SideNav({logginOut}){
 
 	const user = useSelector(state => state.user);
 	const mySidenav = useRef();
-	let history = useHistory();
+	const dispatch = useDispatch();
 
 	if(!user || !user.gUser) return null;
 
@@ -520,9 +518,10 @@ function SideNav(){
 	let username = profile.getName();
 	let userpic = profile.getImageUrl();
 
-	function toHome(){
+	function signOut(){
+		logginOut();
 		toggleMenu();
-		history.push('/');
+		dispatch(logOut());
 	}
 
 	function toggleMenu(){
@@ -553,7 +552,7 @@ function SideNav(){
 			        </div>
 
 			        <div className="card-footer text-muted">
-			            <button type="button" className="btn btn-outline-danger" onClick={()=> toHome() }><i className="fa fa-sign-out"></i>Salir</button>
+			            <button type="button" className="btn btn-outline-danger" onClick={()=> signOut() }><i className="fa fa-sign-out"></i>Salir</button>
 			        </div>
 
 			    </div>
@@ -575,6 +574,7 @@ function Dashboard(){
 	let [sessionExpires, setSessionExpires] = useState(null);
 	let backdropLoading = useRef(null);
 	let cornerLoading = useRef(null);
+	let history = useHistory();
 	const dispatch = useDispatch();
 	const user = useSelector(state => state.user);
 
@@ -594,6 +594,10 @@ function Dashboard(){
 	        dispatch(getFilesList(""));
 	        setFirst(true);
     	}
+    	else if(user.isLogged === false){
+
+    		toHome();
+    	}
     }, [user.isLogged, setFirst, dispatch]);
 
     useEffect(()=>{
@@ -610,6 +614,14 @@ function Dashboard(){
 		cornerLoading.current.classList.remove("loading");
     }
 
+    function turnSpinCenter(){
+		backdropLoading.current.classList.add("loading");
+    }
+
+	function toHome(){
+		history.push('/');
+	}
+
 	return (
 		<React.Fragment>
 			<GeneralOverview />
@@ -623,7 +635,7 @@ function Dashboard(){
 				</div>
 			</div>
 			<FilesCards doneLoading={()=> spinOff() } />
-			<SideNav />
+			<SideNav logginOut={()=> turnSpinCenter()} />
 			<React.Fragment>
 				<div ref={cornerLoading} className="loadingCorner">
 				    <i className="fa fa-spinner fa-spin"></i>
