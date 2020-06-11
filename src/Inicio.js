@@ -1,21 +1,16 @@
-import React, { createRef, useState } from 'react';
+import React, { createRef, useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { connect, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "./redux/actions/index";
 import store from "./redux/store/index";
 import './Inicio.css';
-
-function mapToProps(dispatch) {
-	return{
-		setUser: user => dispatch(setUser(user))
-	}
-}
 
 function Inicio(){
 
   let [loading, setLoading] = useState(true);
   let [renderSent, setRenderSent] = useState(false);
   let gapi = createRef(window.gapi);
+  const dispatch = useDispatch();
 
   const user = useSelector(state => state.user);
 
@@ -47,7 +42,7 @@ function renderButton(){
 			imgUrl: perfil.getImageUrl(),
 			isLogged: true
 		}
-		store.dispatch(setUser(data));
+		dispatch(setUser(data));
 		setLoading(false);
 	}
 
@@ -175,4 +170,4 @@ else{
 
 }
 
-export default connect(mapToProps)(Inicio);
+export default Inicio;
