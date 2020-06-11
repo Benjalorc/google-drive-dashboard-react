@@ -24,7 +24,7 @@ function GeneralOverview(){
 		    <div className="col-12 col-sm-6 col-md-3">
 
 		        <div className="card text-center border-info bg-light">
-		            <a href="https://docs.google.com/documents/" target="_blank"><img className="card-img-top link" src="images/docs.png" alt="Card image cap" /></a>
+		            <a href="https://docs.google.com/documents/" target="_blank" rel="noopener noreferrer"><img className="card-img-top link" src="images/docs.png" alt="Google Docs" /></a>
 		            <div className="card-body">
 		                <p>Documentos</p>
 		            </div>
@@ -37,7 +37,7 @@ function GeneralOverview(){
 		    <div className="col-12 col-sm-6 col-md-3">
 
 		        <div className="card text-center border-success bg-light">
-		            <a href="https://docs.google.com/spreadsheets/" target="_blank"><img className="card-img-top link" src="images/spreadsheets.png" alt="Card image cap" /></a>
+		            <a href="https://docs.google.com/spreadsheets/" target="_blank" rel="noopener noreferrer"><img className="card-img-top link" src="images/spreadsheets.png" alt="Google Sheets" /></a>
 		            <div className="card-body">
 		                <p>Hojas de Cálculo</p>
 		            </div>
@@ -50,7 +50,7 @@ function GeneralOverview(){
 		    <div className="col-12 col-sm-6 col-md-3">
 
 		        <div className="card text-center border-warning bg-light">
-		            <a href="https://docs.google.com/presentation/" target="_blank"><img className="card-img-top link" src="images/slides.png" alt="Card image cap" /></a>
+		            <a href="https://docs.google.com/presentation/" target="_blank" rel="noopener noreferrer"><img className="card-img-top link" src="images/slides.png" alt="Google Presentations" /></a>
 		            <div className="card-body">
 		                <p>Presentaciones</p>
 		            </div>
@@ -63,7 +63,7 @@ function GeneralOverview(){
 		    <div className="col-12 col-sm-6 col-md-3">
 
 		        <div className="card text-center border-danger bg-light">
-		            <a href="https://drive.google.com/" target="_blank"><img className="card-img-top link" src="images/drawings.png" alt="Card image cap" /></a>
+		            <a href="https://drive.google.com/" target="_blank" rel="noopener noreferrer"><img className="card-img-top link" src="images/drawings.png" alt="Google Drawings" /></a>
 		            <div className="card-body">
 		                <p>Drawings</p>
 		            </div>
@@ -90,7 +90,7 @@ function FilesRows({files, short, titulo}){
 					<tr key={`${titulo}-${i+1}`}>
 						<th scope="row">{i+1}</th>
 						<td>{file.name}</td>
-						<td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
+						<td> <a href={file.webViewLink} target="_blank" rel="noopener noreferrer">Ver</a> </td>
 						<td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
 					</tr>
 				)
@@ -106,7 +106,7 @@ function FilesRows({files, short, titulo}){
 					<tr key={`${titulo}-${i+1}`}>
 						<th scope="row">{i+1}</th>
 						<td>{file.name}</td>
-						<td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
+						<td> <a href={file.webViewLink} target="_blank" rel="noopener noreferrer">Ver</a> </td>
 						<td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
 					</tr>
 				)
@@ -219,7 +219,7 @@ function FilesCards({doneLoading}){
 		else if(files.token === false){
 			doneLoading(true);
 		}
-	}, [files, dispatch])
+	}, [files, dispatch, doneLoading])
 
 	return(
 		<React.Fragment>
@@ -454,7 +454,7 @@ function ChangesTable({changes}){
 		                        <tr key={`changes-${i+1}`}>
 		                            <th scope="row">{i+1}</th>
 		                            <td>{file.name}</td>
-		                            <td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
+		                            <td> <a href={file.webViewLink} target="_blank" rel="noopener noreferrer">Ver</a> </td>
 		                            <td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
 		                        </tr>
                     		)
@@ -571,7 +571,7 @@ function SideNav({logginOut}){
 function Dashboard(){
 
 	let [first, setFirst] = useState(false);
-	let [sessionExpires, setSessionExpires] = useState(null);
+	//let [sessionExpires, setSessionExpires] = useState(null);
 	let backdropLoading = useRef(null);
 	let cornerLoading = useRef(null);
 	let history = useHistory();
@@ -596,10 +596,10 @@ function Dashboard(){
     	}
     	else if(user.isLogged === false){
 
-    		toHome();
+    		history.push('/');
     	}
-    }, [user.isLogged, setFirst, dispatch]);
-
+    }, [user.isLogged, first, dispatch, history]);
+/*
     useEffect(()=>{
 
     	if(user && user.gUser){
@@ -608,7 +608,7 @@ function Dashboard(){
     	}
 
     }, [user]);
-
+*/
     function spinOff(){
 		backdropLoading.current.classList.remove("loading");
 		cornerLoading.current.classList.remove("loading");
@@ -617,10 +617,6 @@ function Dashboard(){
     function turnSpinCenter(){
 		backdropLoading.current.classList.add("loading");
     }
-
-	function toHome(){
-		history.push('/');
-	}
 
 	return (
 		<React.Fragment>
