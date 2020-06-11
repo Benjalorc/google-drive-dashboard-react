@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import FilesTable from './FilesTable';
 
 function ChangesTable({changes}){
 
@@ -14,34 +15,7 @@ function ChangesTable({changes}){
 	else{
 
 		return (
-            <div className="table-responsive">
-
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Ubicacion</th>
-                            <th scope="col">Modificado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {
-                    	changes.map((file, i)=>{
-                    		return(
-		                        <tr key={`changes-${i+1}`}>
-		                            <th scope="row">{i+1}</th>
-		                            <td>{file.name}</td>
-		                            <td> <a href={file.webViewLink} target="_blank" rel="noopener noreferrer">Ver</a> </td>
-		                            <td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
-		                        </tr>
-                    		)
-                    	})
-                    }
-                    </tbody>
-                </table>
-
-            </div>
+			<FilesTable files={changes} titulo="changes" />
 		)
 	}
 }
