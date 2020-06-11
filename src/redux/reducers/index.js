@@ -14,7 +14,23 @@ const initialState = {
 		imgUrl: null,
 		isLogged: null
 	},
-	storage: {},
+	storage: {
+		usage: {
+		    storageLimit: 0,
+		    storageUsage: 0,
+		    storageUsageDrive: 0,
+		    storageUsageTrash: 0
+		},
+		uploads: {
+			maxUploadSize: 0
+		},
+		imports: {
+		    document: 0,
+		    draw: 0,
+		    spreadsheet: 0,
+		    presentation: 0
+		}
+	},
 	changes: {
 		token: "",
 		list: []
