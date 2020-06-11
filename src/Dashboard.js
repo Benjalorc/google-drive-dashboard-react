@@ -10,6 +10,7 @@ import {
 import './Dashboard.css';
 import { Chart } from 'chart.js';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 
 function GeneralOverview(){
@@ -75,7 +76,46 @@ function GeneralOverview(){
 	)
 }
 
-function FilesTable({files, titulo, short = true}){
+function FilesRows({files, short, titulo}){
+
+	if(short){
+
+	    let arr = [0,1,2,3,4];
+		return(
+			arr.map((i)=>{
+				let file = files[i];
+				if(!file) return null;
+				return(
+					<tr key={`${titulo}-${i+1}`}>
+						<th scope="row">{i+1}</th>
+						<td>{file.name}</td>
+						<td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
+						<td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
+					</tr>
+				)
+
+			})
+		)
+	}
+	else{
+
+		return(
+			files.map((file, i)=>{
+				return(
+					<tr key={`${titulo}-${i+1}`}>
+						<th scope="row">{i+1}</th>
+						<td>{file.name}</td>
+						<td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
+						<td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
+					</tr>
+				)
+
+			})
+		)
+	}
+}
+
+function FilesTable({files, titulo, tableClass="table-responsive", short = true}){
 
 
 	if(!files || !files.length){
@@ -86,44 +126,64 @@ function FilesTable({files, titulo, short = true}){
 	}
 	else{
 
-		if(short){
+		return(
+			<div className={tableClass}>
 
-			let arr = [0,1,2,3,4];
-			return(
-				<div className="table-responsive">
+			    <table className="table">
+			        <thead>
+			            <tr>
+			                <th scope="col">#</th>
+			                <th scope="col">Nombre</th>
+			                <th scope="col">Ubicacion</th>
+			                <th scope="col">Modificado</th>
+			            </tr>
+			        </thead>
+			        <tbody>
+			        	<FilesRows files={files} short={short} titulo={titulo} />
+			        </tbody>
+		        </table>
 
-				    <table className="table">
-				        <thead>
-				            <tr>
-				                <th scope="col">#</th>
-				                <th scope="col">Nombre</th>
-				                <th scope="col">Ubicacion</th>
-				                <th scope="col">Modificado</th>
-				            </tr>
-				        </thead>
-				        <tbody>
-						{
-							arr.map((i)=>{
-								let file = files[i];
-								if(!file) return null;
-								return(
-									<tr key={`${titulo}-${i+1}`}>
-										<th scope="row">{i+1}</th>
-										<td>{file.name}</td>
-										<td> <a href={file.webViewLink} target="_blank">Ver</a> </td>
-										<td>{file.time.getDate()}-{file.time.getMonth()+1}-{file.time.getFullYear()}</td>
-									</tr>
-								)
+		    </div>
+		)
 
-							})
-						}
-				        </tbody>
-			        </table>
-
-			    </div>
-			)
-		}
 	}
+}
+
+function FilesModal({listado, titulo}){
+
+  const [modal, setModal] = useState(false);
+  const toggle = () => setModal(!modal);
+
+  if(listado.length <= 5){
+  	return(
+      <button type="button" className="btn btn-outline-light" disabled>
+      	<i className="fa fa-folder-o"></i>
+      </button>
+  	)
+  }
+  else{
+
+	  return (
+	    <React.Fragment>
+	      <button type="button" className="btn btn-outline-light" onClick={toggle}>
+	      	<i className="fa fa-folder-open-o"></i> 
+	      </button>
+
+	      <Modal isOpen={modal} size="lg" toggle={toggle}>
+	        <ModalHeader toggle={toggle}>
+	        	{titulo}
+	        </ModalHeader>
+	        <ModalBody>
+	        	<FilesTable files={listado} titulo={titulo} tableClass="table-responsive modal-table" short={false} />
+	        </ModalBody>
+	        <ModalFooter>
+	          <button type="button" className="btn btn-outline-dark" onClick={toggle}>Cerrar</button>
+	        </ModalFooter>
+	      </Modal>
+	    </React.Fragment>
+	  )
+  }
+
 }
 
 function FilesPerType({files, cardClass, headerClass, titulo}){
@@ -134,7 +194,10 @@ function FilesPerType({files, cardClass, headerClass, titulo}){
 		<React.Fragment>
 
 		    <div className={cardClass}>
-		        <div className={headerClass}>{titulo}</div>
+		        <div className={headerClass}>
+		        	<FilesModal listado={files} titulo={titulo} />
+		        	{titulo}
+		        </div>
 		        <div className="card-body">
 		        	<FilesTable files={files} titulo={titulo} />
 		        </div>

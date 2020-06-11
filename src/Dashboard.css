@@ -73,3 +73,8 @@ img.link:active{
 .bd-2+i{
 	 font-size:48px
 }
+
+.modal-table{
+	overflow: auto;
+	height: 20em;
+}
