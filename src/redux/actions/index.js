@@ -4,7 +4,8 @@ import {
 	LOAD_STORAGE,
 	CHECK_STATUS,
 	UPDATE_CHANGES_TOKEN,
-	UPDATE_FILES_TOKEN
+	UPDATE_FILES_TOKEN,
+	CLEAR_STORE
 } from "../constants/action-types";
 
 export function setUser(payload){
@@ -36,13 +37,36 @@ function verifiedStatus(status){
 	}
 }
 
+function clearStore(payload){
+	return {
+		type: CLEAR_STORE,
+		payload
+	}
+}
+
 function waitForGapi(){
 	return new Promise((resolve, reject)=>{
 		let interval = setInterval(check, 1000);
 		function check(){
 			if(window.gapi){
+				setTimeout(()=>{
+					resolve(true);
+				});
 				clearInterval(interval);
-				resolve(true);
+			}
+		}
+	});
+}
+function waitForDrive(){
+	return new Promise((resolve, reject)=>{
+		let interval = setInterval(check, 1000);
+		function check(){
+			if(window.gapi.client
+			&& window.gapi.client.drive){
+				setTimeout(()=>{
+					resolve(true);
+				});
+				clearInterval(interval);
 			}
 		}
 	});
@@ -52,10 +76,11 @@ export function loadStorage(){
 
 	return async function (dispatch) {
 
-		await waitForGapi();
+		await waitForDrive();
 
 		let obj = {'fields': "storageQuota, maxUploadSize, maxImportSizes"};
-		return window.gapi.client.drive.about.get(obj).then((data)=> {
+		const gapi = window.gapi;
+		return gapi.client.drive.about.get(obj).then((data)=> {
 
 			if(data.status === 200){
 
@@ -92,6 +117,21 @@ export function loadStorage(){
 	}
 }
 
+export function logOut(){
+
+	const gapi = window.gapi;
+	let auth2 = gapi.auth2.getAuthInstance();
+
+	return function (dispatch) {
+		return auth2.signOut().then(()=> {
+			setTimeout(() =>{
+				dispatch(clearStore({isLogged: false}));
+			},1500)
+		});
+	}
+
+}
+
 export function checkStatus(){
 
 	return async function (dispatch) {
@@ -108,7 +148,7 @@ export function checkStatus(){
 		const discoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 		let googleAuth;
 
-		let final = ()=>{
+		let final = async ()=>{
 			googleAuth = gapi.auth2.getAuthInstance();
 			let con = googleAuth.isSignedIn.get();
 			if(con){
@@ -117,10 +157,13 @@ export function checkStatus(){
 				let perfil = googleUser.getBasicProfile();
 				let usuario = {
 					gUser: googleUser,
+					gAuth: googleAuth,
 					username: perfil.getName(),
 					imgUrl: perfil.getImageUrl(),
 					isLogged: true
 				}
+
+				await waitForDrive();
 
 				return gapi.client.drive.changes.getStartPageToken().then((res) =>{
 					let token = res.result.startPageToken;
@@ -144,7 +187,7 @@ export function checkStatus(){
 
 export function getChanges() {
 
-	return function (dispatch) {
+	return async function (dispatch) {
 
 		const gapi = window.gapi;
 		let data = {
@@ -152,6 +195,8 @@ export function getChanges() {
 			orderBy: "modifiedTime desc",
 			pageSize: 5
 		};
+
+		await waitForDrive();
 
 		return 	gapi.client.drive.files.list(data).then((res) =>{
 			if(res.status === 200){
@@ -168,7 +213,7 @@ export function getChanges() {
 
 export function getFilesList(pageToken) {
 
-	return function (dispatch) {
+	return async function (dispatch) {
 
 		const gapi = window.gapi;
 		let data = {
@@ -178,6 +223,8 @@ export function getFilesList(pageToken) {
 			q: "mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.google-apps.presentation' or mimeType='application/vnd.google-apps.drawing'",
 			orderBy: "modifiedTime desc"
 		};
+
+		await waitForDrive();
 
 		return gapi.client.drive.files.list(data).then((res)=>{
 			if(res.status === 200){

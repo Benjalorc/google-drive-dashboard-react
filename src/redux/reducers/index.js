@@ -4,48 +4,53 @@ import {
 	LOAD_STORAGE,
 	CHECK_STATUS,
 	UPDATE_CHANGES_TOKEN,
-	UPDATE_FILES_TOKEN
+	UPDATE_FILES_TOKEN,
+	CLEAR_STORE
 } from "../constants/action-types";
 
-const initialState = {
-	user: {
-		gUser: null,
-		username: null,
-		imgUrl: null,
-		isLogged: null
-	},
-	storage: {
-		usage: {
-		    storageLimit: 0,
-		    storageUsage: 0,
-		    storageUsageDrive: 0,
-		    storageUsageTrash: 0
+function initState(){
+	return {
+		user: {
+			gUser: null,
+			gAuth: null,
+			username: null,
+			imgUrl: null,
+			isLogged: null
 		},
-		uploads: {
-			maxUploadSize: 0
+		storage: {
+			usage: {
+			    storageLimit: 0,
+			    storageUsage: 0,
+			    storageUsageDrive: 0,
+			    storageUsageTrash: 0
+			},
+			uploads: {
+				maxUploadSize: 0
+			},
+			imports: {
+			    document: 0,
+			    draw: 0,
+			    spreadsheet: 0,
+			    presentation: 0
+			}
 		},
-		imports: {
-		    document: 0,
-		    draw: 0,
-		    spreadsheet: 0,
-		    presentation: 0
-		}
-	},
-	changes: {
-		token: "",
-		list: []
-	},
-	files: {
-		token: "",
-		list: {
-			docs: [],
-			sheets: [],
-			presentations: [],
-			drawings: []
-		}
-	},
-	status: null
+		changes: {
+			token: "",
+			list: []
+		},
+		files: {
+			token: "",
+			list: {
+				docs: [],
+				sheets: [],
+				presentations: [],
+				drawings: []
+			}
+		},
+		status: null
+	}
 }
+const initialState = initState();
 
 function rootReducer(state = initialState, action){
 
@@ -77,6 +82,9 @@ function rootReducer(state = initialState, action){
 				}
 			};
 			return Object.assign({}, state, {files: data});
+
+		case CLEAR_STORE:
+			return Object.assign({}, state, initState(), {user: action.payload});
 
 		default:
 			return state;
