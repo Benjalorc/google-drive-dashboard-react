@@ -151,12 +151,7 @@ export function checkStatus(){
 				}
 
 				await waitForDrive();
-
-				return gapi.client.drive.changes.getStartPageToken().then((res) =>{
-					let token = res.result.startPageToken;
-					dispatch(recieveTokens(UPDATE_CHANGES_TOKEN, {token: token, list: []}));
-					dispatch(setUser(usuario));
-				});
+				dispatch(setUser(usuario));
 			}
 			else{
 				dispatch(setUser({isLogged: false}));
